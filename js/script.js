@@ -125,7 +125,7 @@ function gameOver() {
     div.classList.add('gameOver');
     gameRunning = false;
 
-    let text = `${skors.left != skors.right ? `${skors.left > skors.right ? 'SOL' : 'SAĞ'} TAKIM KAZANDI!` : 'Berabere'}`;
+    let text = `${skors.left != skors.right ? `Maç Bitti, ${skors.left > skors.right ? 'Sol' : 'Sağ'} Takım Kazandı!` : 'Berabere'}`;
     div.innerHTML = `<span>${text}</span><button onclick="restartGame()">Tekrar Oyna</button>`;
     document.body.appendChild(div);
 }
