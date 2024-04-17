@@ -125,8 +125,10 @@ function gameOver() {
     div.classList.add('gameOver');
     gameRunning = false;
 
-    let text = `${skors.left != skors.right ? `Maç Bitti, ${skors.left > skors.right ? 'Sol' : 'Sağ'} Takım Kazandı!` : 'Berabere'}`;
-    div.innerHTML = `<span>${text}</span><button onclick="restartGame()">Tekrar Oyna</button>`;
+    rightSkor.classList.add('d-none');
+    leftSkor.classList.add('d-none');
+    let text = `${skors.left != skors.right ? `Maç Bitti, ${skors.left > skors.right ? 'Sol' : 'Sağ'} Takım Kazandı! ${skors.left > skors.right ? skors.left : skors.right}-${skors.left > skors.right ? skors.right : skors.left}` : 'Berabere'}`;
+    div.innerHTML = `<span class="text-center">${text}</span><button onclick="restartGame()">Tekrar Oyna</button>`;
     document.body.appendChild(div);
 }
 
@@ -140,8 +142,8 @@ function restartGame() {
     document.body.removeChild(div);
     gameRunning = true;
     rightSkor.innerText = '0';
-    rightSkor.style.removeProperty('right');
     leftSkor.innerText = '0';
+    rightSkor.style.removeProperty('right');
     leftSkor.style.removeProperty('left');
     nums = { left: 50, up: 50 };
     setBallToMiddle();
