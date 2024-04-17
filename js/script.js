@@ -8,74 +8,82 @@ let skors = {
 }
 let time = 30;
 let gameRunning = true;
-timeDiv.innerText = time;
+timeDiv.innerText = `Kalan zaman: ${time}`;
 for (const div of divs) {
     div.style.width = `${100 / divs.length}vw`;
 }
 
 let int = setInterval(() => {
+    timeDiv.innerText = `Kalan zaman: ${--time}`;
     if (time <= 0) {
         gameOver();
         clearInterval(int);
-    } else {
-        timeDiv.innerText = --time;
     }
 }, 1000);
 
 let lastU = 50;
 let nums = move();
-let pressed = false, num = 0;
-let keyList = ['w', 'arrowup', 'arrowdown', 's', 'arrowleft', 'a', 'arrowright', 'd'];
+let pressed = false, lastPressed,
+    num = { w: 0, arrowup: 0, s: 0, arrowdown: 0, a: 0, arrowleft: 0, d: 0, arrowright: 0 },
+    keyList = ['w', 'arrowup', 's', 'arrowdown', 'a', 'arrowleft', 'd', 'arrowright'];
 window.addEventListener('keydown', e => {
-    if (keyList.includes(e.key.toLowerCase())) {
-        num++;
-        if (num >= 5) num++;
-        if (num >= 10) num++;
-        if (num >= 15) num++;
-        if (num >= 20) num++;
-        if (num >= 25) num++;
+    let key = e.key.toLowerCase();
+    if (keyList.includes(key)) {
+        if (lastPressed != key) {
+            for (const key of Object.keys(num)) {
+                num[key] = num[key] == key ? num[key] : 0;
+            }
+        }
+        lastPressed = key;
+
+        num[key]++;
+        if (num[key] >= 5) num[key]++;
+        if (num[key] >= 10) num[key]++;
+        if (num[key] >= 15) num[key]++;
+        if (num[key] >= 20) num[key]++;
+        if (num[key] >= 25) num[key]++;
     }
 });
 
 window.addEventListener('keyup', e => {
     if (e.key == '-') {
         time -= 5;
-        if (time < 0) time = 0;
-        timeDiv.innerText = time;
+        if (time <= 0) time = 0;
+        timeDiv.innerText = `Kalan zaman: ${time}`;
     }
-    if (gameRunning) eventFunc(e);
+    if (gameRunning) eventFunc(e, num[e.key.toLowerCase()]);
 });
 
-function eventFunc(e) {
+function eventFunc(e, numb) {
     const key = e.key.toLowerCase();
     let top, left;
 
     switch (key) {
         case 'w':
         case 'arrowup':
-            top = nums.up - num;
-            nums = move({ top, left: nums.left }, num);
+            top = nums.up - numb;
+            nums = move({ top, left: nums.left });
             break;
         case 's':
         case 'arrowdown':
-            top = nums.up + num;
-            nums = move({ top, left: nums.left }, num);
+            top = nums.up + numb;
+            nums = move({ top, left: nums.left });
             break;
         case 'a':
         case 'arrowleft':
-            left = nums.left - num;
-            nums = move({ top: nums.up, left }, num);
+            left = nums.left - numb;
+            nums = move({ top: nums.up, left });
             break;
         case 'd':
         case 'arrowright':
-            left = nums.left + num;
-            nums = move({ top: nums.up, left }, num);
+            left = nums.left + numb;
+            nums = move({ top: nums.up, left });
             break;
     }
-    num = 0;
+    num[e.key.toLowerCase()] = 0;
 }
 
-function move({ left, top: up } = ball.style, num = 1) {
+function move({ left, top: up } = ball.style) {
     let l = typeof left == 'string' ? Number(left.replace('%', '')) : left;
     let u = typeof up == 'string' ? Number(up.replace('%', '')) : up;
 
@@ -89,15 +97,17 @@ function move({ left, top: up } = ball.style, num = 1) {
     else ball.style.top = '50%';
 
     if (l <= 18 && ((u >= 26 && u <= 74) || Math.abs(lastU - u) >= 55)) {
+        if (skors.right >= 9) rightSkor.style.right = ".5vw";
         rightSkor.innerText = `${++skors.right}`;
         setBallToMiddle()
         return { left: 50, up: 50 };
     } else if (l >= 82 && ((u >= 26 && u <= 74) || Math.abs(lastU - u) >= 55)) {
+        if (skors.left >= 9) leftSkor.style.left = ".5vw";
         leftSkor.innerText = `${++skors.left}`;
         setBallToMiddle()
         return { left: 50, up: 50 };
     }
-    
+
     lastU = u;
     return { left: l, up: u };
 }
@@ -121,20 +131,26 @@ function gameOver() {
 }
 
 function restartGame() {
-    skors.left = 0;
-    skors.right = 0;
+    skors = {
+        left: 0,
+        right: 0
+    }
     time = 30;
-    timeDiv.innerText = time;
+    timeDiv.innerText = `Kalan zaman: ${time}`;
     document.body.removeChild(div);
     gameRunning = true;
     rightSkor.innerText = '0';
+    rightSkor.style.removeProperty('right');
     leftSkor.innerText = '0';
+    leftSkor.style.removeProperty('left');
+    nums = { left: 50, up: 50 };
     setBallToMiddle();
 
-    let int = setInterval(() => {
+    int = setInterval(() => {
+        timeDiv.innerText = `Kalan zaman: ${--time}`;
         if (time <= 0) {
             gameOver();
             clearInterval(int);
-        } else timeDiv.innerText = --time;
+        }
     }, 1000);
 }
